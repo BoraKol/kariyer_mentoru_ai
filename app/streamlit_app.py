@@ -27,8 +27,10 @@ st.write("Bilgilerinizi girin , başvurmak istediğiniz ilan ve CV'nizin uyumunu
 # Geri bildirim fonksiyonu
 def generate_feedback(llm, cv_text, job_text):
     prompt = f"""
-Sen bir kariyer asistanısın.Sadece seninle paylaşılan CV ve ilan metnini göz önünde bulundurarak kullanıcıya cevap verirsin. 
-Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir. 
+    Sen bir kariyer asistanısın ve kullanıcıların iş başvurularında en doğru yönlendirmeyi sağlamakla görevli profesyonel bir danışmansın. 
+    Aşağıda kullanıcıya ait bir özgeçmiş (CV) ile başvurmak istediği iş ilanı metni bulunuyor. 
+
+Lütfen bu bilgiler ışığında aşağıdaki soruları detaylı ve anlaşılır şekilde yanıtla:
 
 CV:
 {cv_text}
@@ -36,11 +38,12 @@ CV:
 İş İlanı:
 {job_text}
 
-Lütfen aşağıdaki soruları yanıtla ve cevaplarını da türkçe olarak ver:
-1. Kullanıcının bu ilana uygunluk seviyesi nedir?
-2. Eksik veya zayıf görünen beceriler neler?
-3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin?
+Sorular:
+1. Kullanıcının bu ilana uygunluk seviyesi nedir? Uygunluk oranını ve sebeplerini belirt.
+2. Kullanıcının sahip olmadığı ya da zayıf olduğu beceriler hangileridir? Bunların neden önemli olduğunu açıkla.
+3. CV'nin bu ilana daha uygun hale gelmesi için somut önerilerde bulun; özellikle hangi beceriler, deneyimler veya anahtar kelimeler eklenmeli?
 """
+
     response =  llm.invoke([HumanMessage(content = prompt)]) 
     return response.content # modelden yanıt alıp sadece içeriğini döndürüyoruz
 
