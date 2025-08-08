@@ -27,7 +27,8 @@ st.write("Bilgilerinizi girin , başvurmak istediğiniz ilan ve CV'nizin uyumunu
 # Geri bildirim fonksiyonu
 def generate_feedback(llm, cv_text, job_text):
     prompt = f"""
-Sen bir kariyer asistanısın ve sadece bu konuda kullanıcıya yanıtlar verirsin. Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir.
+Sen bir kariyer asistanısın.Sadece seninle paylaşılan CV ve ilan metnini göz önünde bulundurarak kullanıcıya cevap verirsin. 
+Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir. 
 
 CV:
 {cv_text}
@@ -35,7 +36,7 @@ CV:
 İş İlanı:
 {job_text}
 
-Lütfen aşağıdaki soruları yanıtla:
+Lütfen aşağıdaki soruları yanıtla ve cevaplarını da türkçe olarak ver:
 1. Kullanıcının bu ilana uygunluk seviyesi nedir?
 2. Eksik veya zayıf görünen beceriler neler?
 3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin?
@@ -49,7 +50,7 @@ col1, col2 = st.columns([1, 2])
 
 # Sol sütun: Girdiler, kullanıcıdan veri alma kısmı 
 with col1:
-    st.header("📄 Bilgilerinizi Girin") # başlık
+    # st.header("📄 Bilgilerinizi Girin") # başlık
     uploaded_file = st.file_uploader("CV'nizi yükleyin (.pdf)", type="pdf") # kullanıcıdan .pdf formatında CV dosyasını yüklemesini istiyoruz
     
     if uploaded_file is not None: # eğer dosya yüklendiyse , kullanıcıya başarılı mesajı göster
@@ -112,8 +113,9 @@ with col2:
             st.session_state.chat_history = [] # gecmisi sifirla 
             st.rerun() # sayfayi yeniden yukle 
 
-        for role, message in st.session_state.chat_history: # sohbet gecmisindeki her mesaji sirayla goster 
-            with st.chat_message(role.split()[0].lower()): # role gore mesaji goster : kullanici veya AI mesaji 
-                st.markdown(message) # mesaji markdown olarak yazdir 
+        for message in st.session_state.chat_history: # sohbet gecmisindeki her mesaji sirayla goster 
+            if(message[0] == "🤖 Kariyer Asistanı"): # burada message yapisi soyle oldugu icin message[0]'a gore filtreledik : message(("ai" , "ai mesaji burada"))
+                                                      # message[0] => ai , message[1] şeklinde bir tuple
+                st.markdown(f"**{message[0]}**  : \n\n {message[1]}") # mesaji markdown olarak yazdir 
             
            
