@@ -1,30 +1,29 @@
 import streamlit as st # streamlit kullanarak web arayüzü oluşturmak için
 
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings # openai modelleri ve embedding'leri için
+# from langchain_openai import ChatOpenAI, OpenAIEmbeddings # openai modelleri ve embedding'leri için
 from langchain_community.vectorstores import FAISS # vektör tabanlı arama(semantic search) için
 from langchain_community.document_loaders import PyPDFLoader # PDF dosyasını metne çevirmek için
 from langchain.text_splitter import RecursiveCharacterTextSplitter # Metni küçük parçalara ayırmak için
-from dotenv import load_dotenv # .env dosyasından API anahtarını okumak için
+from langchain_community.embeddings import HuggingFaceEmbeddings # huggingface tabanlı embedding modeli
+from langchain_together import ChatTogether
+from langchain_core.messages import AIMessage , HumanMessage
+
+from dotenv import load_dotenv
+
 import tempfile # geçici dosyalar oluşturmak için
-import os # ortam değişkenleriyle çalışmak için
+import os 
 
-load_dotenv() # ortam değişkenlerini yüklüyoruz
-
-# OpenAI API keyini ortam değişkenlerinden alıp sisteme yüklüyoruz
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-if OPENAI_API_KEY is None:
-    raise ValueError("OPENAI_API_KEY is not found.")
+load_dotenv()
 
 # streamlit Sayfa başlığı ve ikon ayarları
-st.set_page_config(page_title="Kariyer Mentor Asistanı", page_icon="🧠")
-st.title("🧠 Kariyer Mentor Asistanı")
+st.set_page_config(page_title="Kariyer Mentoru Asistanı", page_icon="🧠")
+st.title("🧠 Kariyer Mentoru AI")
 st.write("Bilgilerinizi girin , başvurmak istediğiniz ilan ve CV'nizin uyumunu Kariyer Mentoru AI değerlendirsin.")
 
 # Geri bildirim fonksiyonu
 def generate_feedback(llm, cv_text, job_text):
     prompt = f"""
-Sen bir kariyer asistanısın. Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir.
+Sen bir kariyer asistanısın ve sadece bu konuda kullanıcıya yanıtlar verirsin. Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir.
 
 CV:
 {cv_text}
@@ -37,7 +36,8 @@ Lütfen aşağıdaki soruları yanıtla:
 2. Eksik veya zayıf görünen beceriler neler?
 3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin?
 """
-    return llm.invoke(prompt).content # modelden yanıt alıp sadece içeriğini döndürüyoruz
+    response =  llm.invoke([HumanMessage(content = prompt)]) 
+    return response.content # modelden yanıt alıp sadece içeriğini döndürüyoruz
 
 
 # Arayüz düzeni - 1'e 2 oranında 2 kolon oluşturalım
@@ -73,12 +73,17 @@ with col2:
             splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
             docs = splitter.split_documents(documents)
 
-            # Embedding olusturmak icin OPENAI embedding modeli kullaniliyor
-            embedding = OpenAIEmbeddings(model="text-embedding-3-large") 
+            # Embedding olusturmak icin Huggingface'den open source bir embedding modeli kullaniliyor
+            embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2") 
             knowledge_base = FAISS.from_documents(docs, embedding) # parcalanmis dokumanlardan vektor veritabani olustur
 
-            # OPENAI dil modeli
-            llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+            # Together dil modeli
+            llm = ChatTogether(
+                model="mistralai/Mixtral-8x7B-Instruct-v0.1",  # veya birlikte çalıştığın başka bir model
+                temperature=0.2,
+                max_tokens=1024,
+                together_api_key=os.getenv("TOGETHER_AI_API_KEY")
+            )
 
             # CV metnini tek bir string haline getiriyoruz
             cv_text = "\n".join([doc.page_content for doc in documents])
