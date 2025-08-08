@@ -15,6 +15,8 @@ import os
 
 load_dotenv()
 
+os.environ["OPENAI_API_KEY"] = os.getenv("TOGETHER_AI_API_KEY")
+
 # streamlit Sayfa başlığı ve ikon ayarları
 st.set_page_config(page_title="Kariyer Mentoru Asistanı", page_icon="🧠")
 st.title("🧠 Kariyer Mentoru AI")
