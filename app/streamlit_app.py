@@ -15,7 +15,9 @@ import os
 
 load_dotenv()
 
-os.environ["OPENAI_API_KEY"] = os.getenv("TOGETHER_AI_API_KEY")
+together_key = os.getenv("TOGETHER_AI_API_KEY")
+if together_key is None:
+    raise ValueError("TOGETHER_AI_API_KEY environment variable is not set.")
 
 # streamlit Sayfa başlığı ve ikon ayarları
 st.set_page_config(page_title="Kariyer Mentoru Asistanı", page_icon="🧠")
@@ -84,7 +86,7 @@ with col2:
                 model="mistralai/Mixtral-8x7B-Instruct-v0.1",  # veya birlikte çalıştığın başka bir model
                 temperature=0.2,
                 max_tokens=1024,
-                together_api_key=os.getenv("TOGETHER_AI_API_KEY")
+                together_api_key=together_key
             )
 
             # CV metnini tek bir string haline getiriyoruz
