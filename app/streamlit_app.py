@@ -21,16 +21,14 @@ if together_key is None:
 
 # streamlit Sayfa başlığı ve ikon ayarları
 st.set_page_config(page_title="Kariyer Mentoru Asistanı", page_icon="🧠")
-st.title("🧠 Kariyer Mentoru AI")
+st.markdown("## <div style='text-align:center;'> 🧠 Kariyer Mentoru AI </div>" , unsafe_allow_html= True) ## unsafe_allow_html ile html tag'leri aktif oluyor
 st.write("Bilgilerinizi girin , başvurmak istediğiniz ilan ve CV'nizin uyumunu Kariyer Mentoru AI değerlendirsin.")
 
 # Geri bildirim fonksiyonu
-def generate_feedback(llm, cv_text, job_text):
+def generate_feedback(llm, cv_text, job_text , lang_sel):
     prompt = f"""
-    Sen bir kariyer asistanısın ve kullanıcıların iş başvurularında en doğru yönlendirmeyi sağlamakla görevli profesyonel bir danışmansın. 
-    Aşağıda kullanıcıya ait bir özgeçmiş (CV) ile başvurmak istediği iş ilanı metni bulunuyor. 
-
-Lütfen bu bilgiler ışığında aşağıdaki soruları detaylı ve anlaşılır şekilde yanıtla:
+Sen bir kariyer asistanısın.Sadece seninle paylaşılan CV ve ilan metnini göz önünde bulundurarak {lang_sel} dilinde kullanıcıya cevap verirsin. 
+Aşağıda bir kullanıcının özgeçmişi (CV) ve başvurmak istediği iş ilanı metni verilmiştir. 
 
 CV:
 {cv_text}
@@ -38,12 +36,14 @@ CV:
 İş İlanı:
 {job_text}
 
-Sorular:
-1. Kullanıcının bu ilana uygunluk seviyesi nedir? Uygunluk oranını ve sebeplerini belirt.
-2. Kullanıcının sahip olmadığı ya da zayıf olduğu beceriler hangileridir? Bunların neden önemli olduğunu açıkla.
-3. CV'nin bu ilana daha uygun hale gelmesi için somut önerilerde bulun; özellikle hangi beceriler, deneyimler veya anahtar kelimeler eklenmeli?
-"""
+Dil Seçimi: 
+{lang_sel}
 
+Lütfen aşağıdaki soruları yanıtla ve cevaplarını da {lang_sel} dilinde ver:
+1. Kullanıcının bu ilana uygunluk seviyesi nedir? Kullanıcının ilanla uyumlu olduğu noktaları ✅ ikonuyla alt alta sırala.
+2. Eksik veya zayıf görünen beceriler neler? Kullanıcının ilan özelinde zayıf veya geliştirmesi gereken noktaları ⚠️ ikonuyla alt alta sırala.
+3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin?
+"""
     response =  llm.invoke([HumanMessage(content = prompt)]) 
     return response.content # modelden yanıt alıp sadece içeriğini döndürüyoruz
 
@@ -60,6 +60,13 @@ with col1:
         st.success("CV başarıyla işlendi!")
     
     user_input = st.text_area("💼 Başvurmak istediğiniz iş ilanını buraya yapıştırın:", height=100) # kullanıcının başvurmak isteği ilanı metin kutusuna yazması için alan
+    lang_sel = st.radio("Dil Seçimi:" , ['Türkçe' ,'İngilizce' , 'Almanca' , 'Rusça'])
+
+    # if lang_sel == "Türkçe":
+    #     st.success("Türkçe")
+    # else : 
+    #     st.success("İngilizce")
+
     submit = st.button("🚀 Değerlendir") # değerlendirme butonu
 
 # Sağ sütun: Sonuçların , ai asistanının cevabının olduğu sutun ve sohbet gecmisi
@@ -102,11 +109,11 @@ with col2:
                 st.session_state.chat_history = []
 
             # dil modelinden geri bildirim alma metodu cagiriliyor ve geri bildirim aliniyor
-            response = generate_feedback(llm, cv_text, job_text)
+            response = generate_feedback(llm, cv_text, job_text,lang_sel)
 
             # kullanicinin girisi ve asistanin cevabi sohbet gecmisine ekleniyor
             st.session_state.chat_history.append(("🧑‍💼 CV & İş İlanı Gönderildi", job_text))
-            st.session_state.chat_history.append(("🤖 Kariyer Asistanı", response))
+            st.session_state.chat_history.append(("🤖 AI Assistant", response))
 
     # Sohbet Gecmisi varsa ekranda gosteriyoruz
     if "chat_history" in st.session_state:
@@ -117,7 +124,7 @@ with col2:
             st.rerun() # sayfayi yeniden yukle 
 
         for message in st.session_state.chat_history: # sohbet gecmisindeki her mesaji sirayla goster 
-            if(message[0] == "🤖 Kariyer Asistanı"): # burada message yapisi soyle oldugu icin message[0]'a gore filtreledik : message(("ai" , "ai mesaji burada"))
+            if(message[0] == "🤖 AI Assistant"): # burada message yapisi soyle oldugu icin message[0]'a gore filtreledik : message(("ai" , "ai mesaji burada"))
                                                       # message[0] => ai , message[1] şeklinde bir tuple
                 st.markdown(f"**{message[0]}**  : \n\n {message[1]}") # mesaji markdown olarak yazdir 
             
