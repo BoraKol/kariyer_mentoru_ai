@@ -60,7 +60,7 @@ with col1:
         st.success("CV başarıyla işlendi!")
     
     user_input = st.text_area("💼 Başvurmak istediğiniz iş ilanını buraya yapıştırın:", height=100) # kullanıcının başvurmak isteği ilanı metin kutusuna yazması için alan
-    lang_sel = st.radio("Dil Seçimi:" , ['Türkçe' ,'İngilizce' , 'Almanca' , 'Rusça'])
+    lang_sel = st.radio("Dil Seçimi:" , ['Türkçe' ,'İngilizce']) ## modelin dil desteginden oturu diger diller kaldirildi.
 
     # if lang_sel == "Türkçe":
     #     st.success("Türkçe")
