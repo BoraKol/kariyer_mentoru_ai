@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 import tempfile # geçici dosyalar oluşturmak için
 import os 
 
+import json
+
 load_dotenv()
 
 together_key = os.getenv("TOGETHER_AI_API_KEY")
@@ -39,10 +41,22 @@ CV:
 Dil Seçimi: 
 {lang_sel}
 
-Lütfen aşağıdaki soruları yanıtla ve cevaplarını da {lang_sel} dilinde ver:
-1. Kullanıcının bu ilana uygunluk seviyesi nedir? Kullanıcının ilanla uyumlu olduğu noktaları ✅ ikonuyla alt alta sırala.
-2. Eksik veya zayıf görünen beceriler neler? Kullanıcının ilan özelinde zayıf veya geliştirmesi gereken noktaları ⚠️ ikonuyla alt alta sırala.
-3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin? Açıkla.
+Cevabı şu iki bölüm halinde ver:
+[1] JSON formatında skorlar(Sadece bu JSON'u döndür):
+{{
+    "technical_skills: yüzde(0-100),
+    "communication_skills": yüzde(0-100),
+    "problem_solving": yüzde(0-100),
+    teamwork": yüzde(0-100),
+    "adaptability": yüzde(0-100), 
+    "overall_fit": yüzde(0-100) 
+}}
+
+[2] Açıklayıcı analiz ({lang_sel} dilinde, emoji kullanarak): 
+- Kullanıcının güçlü yönleri(✅ ile sırala)
+- Eksik yönleri(⚠️ ile sırala)
+- Cv'yi bu ilana daha uygun hale getirmek için öneriler(💡 ile sırala)
+- Genel değerlendirme ve öneriler(📊 ile sırala)
 """
     response =  llm.invoke([HumanMessage(content = prompt)]) 
     return response.content # modelden yanıt alıp sadece içeriğini döndürüyoruz
@@ -111,21 +125,38 @@ with col2:
             # dil modelinden geri bildirim alma metodu cagiriliyor ve geri bildirim aliniyor
             response = generate_feedback(llm, cv_text, job_text,lang_sel)
 
+            ## response içerisindeki JSON Kısmını ayıkla(parse et)
+            json_start = response.find("{")
+            json_end = response.find("}") + 1
+            scores = json.loads(response[json_start:json_end])
+
+            ## metin analizi kısmını ayarlayalım 
+            analysis = response[json_end:]
+
+            ## Progress bar ile skorları gosterelim
+            st.subheader("📊 Kategori Bazlı Değerlendirme")
+            for category , score in scores.items():
+                st.write(f"**{category.capitalize()}**: {score}%")
+                st.progress(score/100)
+            
+            st.subheader("📝 Detaylı Analiz")
+            st.write(analysis) 
+
             # kullanicinin girisi ve asistanin cevabi sohbet gecmisine ekleniyor
             st.session_state.chat_history.append(("🧑‍💼 CV & İş İlanı Gönderildi", job_text))
             st.session_state.chat_history.append(("🤖 AI Assistant", response))
 
     # Sohbet Gecmisi varsa ekranda gosteriyoruz
     if "chat_history" in st.session_state:
-        st.subheader("💬 Sohbet Geçmişi") # gecmis basligi
+        # st.subheader("💬 Sohbet Geçmişi") # gecmis basligi
         
         if st.button("🧹 Sohbeti Temizle"): # sohbet gecmisini temizlemek icin bir buton
             st.session_state.chat_history = [] # gecmisi sifirla 
             st.rerun() # sayfayi yeniden yukle 
 
-        for message in st.session_state.chat_history: # sohbet gecmisindeki her mesaji sirayla goster 
-            if(message[0] == "🤖 AI Assistant"): # burada message yapisi soyle oldugu icin message[0]'a gore filtreledik : message(("ai" , "ai mesaji burada"))
-                                                      # message[0] => ai , message[1] şeklinde bir tuple
-                st.markdown(f"**{message[0]}**  : \n\n {message[1]}") # mesaji markdown olarak yazdir 
+        # for message in st.session_state.chat_history: # sohbet gecmisindeki her mesaji sirayla goster 
+        #     if(message[0] == "🤖 AI Assistant"): # burada message yapisi soyle oldugu icin message[0]'a gore filtreledik : message(("ai" , "ai mesaji burada"))
+        #                                               # message[0] => ai , message[1] şeklinde bir tuple
+        #         st.markdown(f"**{message[0]}**  : \n\n {message[1]}") # mesaji markdown olarak yazdir 
             
            
