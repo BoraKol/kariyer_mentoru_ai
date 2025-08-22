@@ -42,7 +42,7 @@ Dil Seçimi:
 Lütfen aşağıdaki soruları yanıtla ve cevaplarını da {lang_sel} dilinde ver:
 1. Kullanıcının bu ilana uygunluk seviyesi nedir? Kullanıcının ilanla uyumlu olduğu noktaları ✅ ikonuyla alt alta sırala.
 2. Eksik veya zayıf görünen beceriler neler? Kullanıcının ilan özelinde zayıf veya geliştirmesi gereken noktaları ⚠️ ikonuyla alt alta sırala.
-3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin?
+3. CV'yi bu ilana daha uygun hale getirmek için neler önerirsin? Açıkla.
 """
     response =  llm.invoke([HumanMessage(content = prompt)]) 
     return response.content # modelden yanıt alıp sadece içeriğini döndürüyoruz
@@ -94,7 +94,7 @@ with col2:
 
             # Together dil modeli
             llm = ChatTogether(
-                model="mistralai/Mixtral-8x7B-Instruct-v0.1",  # veya birlikte çalıştığın başka bir model
+                model="google/gemma-2-27b-it",  # veya birlikte çalıştığın başka bir model
                 temperature=0.2,
                 max_tokens=1024,
                 together_api_key=together_key
