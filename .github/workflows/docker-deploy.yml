@@ -18,8 +18,20 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
+    # Backend image
+    - name: Build and push backend image
       uses: docker/build-push-action@v4
       with:
+        context: ./backend
+        file: ./backend/Dockerfile
         push: true
-        tags: borakol/kariyer_mentoru_ai:latest
+        tags: borakol/kariyer_mentoru_backend:latest
+
+    # Frontend image
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        tags: borakol/kariyer_mentoru_frontend:latest
