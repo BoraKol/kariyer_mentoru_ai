@@ -31,39 +31,58 @@ app.add_middleware(
 
 def generate_feedback(cv_text, job_text, lang_sel):
     prompt = f"""
-Sen bir kariyer asistanısın.Sadece seninle paylaşılan CV ve ilan metnini göz önünde bulundurarak {lang_sel} dilinde kullanıcıya cevap verirsin. 
+Sen profesyonel bir kariyer danışmanısın. Görevin, bir adayın CV'sini ve iş ilanı metnini karşılaştırarak
+uyumluluk değerlendirmesi yapmaktır. Yanıtın {lang_sel} dilinde olmalıdır.
 
-CV:
+---
+📄 CV:
 {cv_text}
 
-İş İlanı:
+💼 İş İlanı:
 {job_text}
+---
 
-Cevabı şu iki bölüm halinde ver:
-[1] JSON formatında skorlar(Sadece bu JSON'u döndür):
+Aşağıdaki kurallara **kesinlikle uymalısın**:
+
+1️⃣ **İlk olarak sadece geçerli JSON formatında** şu yapıyı döndür:
 {{
-    "technical_skills": yüzde(0-100),
-    "communication_skills": yüzde(0-100),
-    "problem_solving": yüzde(0-100),
-    "teamwork": yüzde(0-100),
-    "adaptability": yüzde(0-100), 
-    "overall_fit": yüzde(0-100) 
+  "technical_skills": 0-100 arasında bir tam sayı,
+  "communication_skills": 0-100 arasında bir tam sayı,
+  "problem_solving": 0-100 arasında bir tam sayı,
+  "teamwork": 0-100 arasında bir tam sayı,
+  "adaptability": 0-100 arasında bir tam sayı,
+  "overall_fit": 0-100 arasında bir tam sayı
 }}
 
-[2] Açıklayıcı analiz ({lang_sel} dilinde, emoji kullanarak): 
-- Kullanıcının güçlü yönleri(✅ ile sırala)
-- Eksik yönleri(⚠️ ile sırala)
-- Cv'yi bu ilana daha uygun hale getirmek için öneriler(💡 ile sırala)
-- Genel değerlendirme ve öneriler(📊 ile sırala)
+2️⃣ JSON çıktısından sonra, aşağıdaki başlıklarla **detaylı ve doğal** açıklama ver:
+---
+📝 **Detaylı Analiz ve Öneriler ({lang_sel})**
+✅ Güçlü Yönler:
+- ...
+
+⚠️ Geliştirilmesi Gereken Alanlar:
+- ...
+
+💡 İyileştirme Önerileri:
+- ...
+
+📊 Genel Değerlendirme:
+- ...
+---
+
+Kurallar:
+- JSON kısmı ve analiz kısmı arasında en az bir boş satır bırak.
+- JSON formatına ek yorum ekleme.
+- Yanıtın tamamı {lang_sel} dilinde olmalı.
 """
     
     response = client.chat.completions.create(
-        model="accounts/fireworks/models/gpt-oss-20b",  # Fireworks modeli
+        model="accounts/fireworks/models/qwen3-coder-480b-a35b-instruct",  # Fireworks modeli
         messages=[
             {"role": "system", "content": "Sen kariyer danışmanı bir asistansın."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=512,
+        max_tokens=4096,
         temperature=0.2,
     )
 
@@ -86,7 +105,7 @@ async def analyze(cv: UploadFile, job_text: str = Form(...), lang_sel: str = For
     loader = PyPDFLoader(tmp_path)
     documents = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     docs = splitter.split_documents(documents)
 
     # embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
