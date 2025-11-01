@@ -1,7 +1,7 @@
 import streamlit as st
 import requests 
 
-API_URL = "https://kariyer-mentoru-ai.onrender.com"
+API_URL = "https://kariyer-mentoru-ai.onrender.com/analyze"
 
 st.set_page_config(page_title="Kariyer Mentoru Asistanı" , page_icon="🧠")
 st.markdown("## <div style='text-align:center;'> 🧠 Kariyer Mentoru AI </div> " , unsafe_allow_html=True)
@@ -25,7 +25,7 @@ with col2:
             "lang_sel" : lang_sel}
 
             with st.spinner("Analiz ediliyor..."): 
-                response = requests.post(API_URL , files = files , data = data)
+                response = requests.post(API_URL , files = files , data = data , timeout=120)
 
             if response.status_code == 200:
                 result = response.json()

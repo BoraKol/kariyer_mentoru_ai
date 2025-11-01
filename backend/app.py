@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.messages import HumanMessage
 import tempfile, os, json
 from dotenv import load_dotenv
@@ -86,7 +86,7 @@ async def analyze(cv: UploadFile, job_text: str = Form(...), lang_sel: str = For
     splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
     docs = splitter.split_documents(documents)
 
-    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     # knowledge_base = FAISS.from_documents(docs, embedding)
 
     cv_text = "\n".join([doc.page_content for doc in documents])

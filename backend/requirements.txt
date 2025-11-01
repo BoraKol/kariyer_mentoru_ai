@@ -4,6 +4,7 @@ python-multipart
 langchain
 langchain-community
 fireworks-ai
+langchain-huggingface
 sentence-transformers
 faiss-cpu
 pypdf
