@@ -14,7 +14,8 @@ COPY . .
 EXPOSE 10000 
 
 # uvicorn ile FastAPI'yi calistir , render ortamında $PORT degiskeni atanir ve fastapi bu portu dinler
-CMD ["uvicorn" , "app:app" , "--host" , "0.0.0.0" , "--port ${PORT:-10000}"]
+# render'daki container sh -c ile degiskenleri yorumlayabiliyor
+CMD sh -c "uvicorn app:app --host 0.0.0.0 --port ${PORT:-10000}"
 
 
 
