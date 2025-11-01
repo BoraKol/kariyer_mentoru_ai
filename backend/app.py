@@ -2,11 +2,11 @@ import asyncio
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from langchain_community.vectorstores import FAISS
+# from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.messages import HumanMessage
+# from langchain_core.messages import HumanMessage
 import tempfile, os, json
 from dotenv import load_dotenv
 from fireworks.client import Fireworks  # 🔥 Fireworks SDK
@@ -63,15 +63,18 @@ Cevabı şu iki bölüm halinde ver:
             {"role": "system", "content": "Sen kariyer danışmanı bir asistansın."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=1024,
+        max_tokens=512,
         temperature=0.2,
     )
 
     return response.choices[0].message.content
 
 
-
 # ---------- API ROUTES ----------
+@app.get("/")
+def root():
+    return {"status" : "ok"}
+
 @app.post("/analyze")
 async def analyze(cv: UploadFile, job_text: str = Form(...), lang_sel: str = Form("Türkçe")):
     # Geçici dosyaya kaydet
@@ -86,10 +89,10 @@ async def analyze(cv: UploadFile, job_text: str = Form(...), lang_sel: str = For
     splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
     docs = splitter.split_documents(documents)
 
-    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    # embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     # knowledge_base = FAISS.from_documents(docs, embedding)
 
-    cv_text = "\n".join([doc.page_content for doc in documents])
+    cv_text = "\n".join([doc.page_content for doc in docs])
     response = generate_feedback(cv_text, job_text, lang_sel)
 
     # JSON ve analiz kısmını ayıkla
