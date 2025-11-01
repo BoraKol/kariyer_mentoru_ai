@@ -10,10 +10,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kodları kopyalayalim 
 COPY . .  
 
-EXPOSE 8000 
+## render'da deploy edecegimiz icin render'in kullandigi portu acalim
+EXPOSE 10000 
 
-# uvicorn ile FastAPI'yi calistir 
-CMD ["uvicorn" , "app:app" , "--host" , "0.0.0.0" , "--port" , "8000" , "--reload"]
+# uvicorn ile FastAPI'yi calistir , render ortamında $PORT degiskeni atanir ve fastapi bu portu dinler
+CMD ["uvicorn" , "app:app" , "--host" , "0.0.0.0" , "--port ${PORT:-10000}"]
 
 
 
