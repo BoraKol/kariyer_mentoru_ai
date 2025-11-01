@@ -3,7 +3,6 @@ uvicorn
 python-multipart
 langchain
 langchain-community
-langchain-text-splitters
 fireworks-ai
 sentence-transformers
 faiss-cpu

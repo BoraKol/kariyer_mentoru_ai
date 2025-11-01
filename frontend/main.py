@@ -1,7 +1,7 @@
 import streamlit as st
 import requests 
 
-API_URL = "http://backend:8000/analyze"
+API_URL = "https://kariyer-mentoru-ai.onrender.com"
 
 st.set_page_config(page_title="Kariyer Mentoru Asistanı" , page_icon="🧠")
 st.markdown("## <div style='text-align:center;'> 🧠 Kariyer Mentoru AI </div> " , unsafe_allow_html=True)

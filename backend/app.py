@@ -83,11 +83,11 @@ async def analyze(cv: UploadFile, job_text: str = Form(...), lang_sel: str = For
     loader = PyPDFLoader(tmp_path)
     documents = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
     docs = splitter.split_documents(documents)
 
-    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    knowledge_base = FAISS.from_documents(docs, embedding)
+    embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+    # knowledge_base = FAISS.from_documents(docs, embedding)
 
     cv_text = "\n".join([doc.page_content for doc in documents])
     response = generate_feedback(cv_text, job_text, lang_sel)
