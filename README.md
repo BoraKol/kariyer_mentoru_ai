@@ -25,6 +25,8 @@ Proje iki ana bileşenden oluşur:
 > Backend Render ortamında deploy edilmiştir.  
 > Frontend, Docker Compose ile lokal olarak çalıştırıldığında Render’daki backend’e bağlanır.
 
+---
+
 📁 kariyer_mentoru_ai/
 │
 ├── .env
@@ -54,6 +56,8 @@ BACKEND_URL=https://your-render-backend.onrender.com
 MODEL_PROVIDER_API_KEY=your_api_key_here
 
 > Bu sayede frontend, Render’daki backend’e otomatik olarak bağlanır.
+
+---
  
 🐳 Docker Compose ile Çalıştırma
 
@@ -64,12 +68,17 @@ docker compose up --build
 Komut tamamlandığında Streamlit arayüzü şu adreste çalışacaktır:
 👉 http://localhost:8501
 
+---
+
 🌐 Servis Erişimleri
-| Servis                        | Adres                                                                                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------- |
-| **Frontend (Streamlit)**      | [http://localhost:8501](http://localhost:8501)                                                 |
-| **Backend (Render)**          | [https://your-render-backend.onrender.com](https://your-render-backend.onrender.com)           |
+
+| Servis | Adres |
+|--------|-------|
+| **Frontend (Streamlit)** | [http://localhost:8501](http://localhost:8501) |
+| **Backend (Render)** | [https://your-render-backend.onrender.com](https://your-render-backend.onrender.com) |
 | **Backend Docs (Swagger UI)** | [https://your-render-backend.onrender.com/docs](https://your-render-backend.onrender.com/docs) |
+
+---
 
 🧠 Model Entegrasyonu
 
@@ -77,6 +86,8 @@ Backend, app.py içinde yapılandırılmış LLM API’sine bağlanarak kullanı
 Kullanılan model: **Qwen3, DeepSeek-R1, veya Llama4-Maverick-Instruct** gibi gelişmiş açık kaynak modellerden biri olabilir.
 
 Model seçimi .env dosyasındaki yapılandırmaya göre değiştirilebilir.
+
+---
 
 🧪 Lokal Geliştirme Modu
 Backend’i Lokal Çalıştırma (Render’a deploy öncesi test için)
@@ -91,18 +102,22 @@ cd frontend
 pip install -r requirements.txt
 streamlit run main.py
 
+---
+
 ☁️ Render Üzerinde Backend Deploy Adımları
 
-**1.** Render.com hesabınıza giriş yapın.
-**2.** Yeni bir Web Service oluşturun.
-**3.** Kaynak olarak backend/ klasörünü içeren GitHub repo’sunu seçin.
-**4.** Environment: Docker
-**5.** Start Command:
+1. Render.com hesabınıza giriş yapın.
+2. Yeni bir Web Service oluşturun.
+3. Kaynak olarak backend/ klasörünü içeren GitHub repo’sunu seçin.
+4. Environment: Docker
+5. Start Command:
 
     sh -c "uvicorn app:app --host 0.0.0.0 --port ${PORT:-10000}"
 
-**6.** Deploy tamamlandığında size bir https://<app-name>.onrender.com URL’si verilir.
-**7.** Bu URL’yi .env dosyasındaki BACKEND_URL değerine yazın.
+6. Deploy tamamlandığında size bir https://<app-name>.onrender.com URL’si verilir.
+7. Bu URL’yi .env dosyasındaki BACKEND_URL değerine yazın.
+
+---
 
 🧱 Kullanılan Teknolojiler
 
@@ -114,10 +129,14 @@ streamlit run main.py
 * Fireworks / HuggingFace / Together API – LLM sağlayıcı entegrasyonları
 * LangChain – PDF yükleme ve metin işleme desteği
 
+---
+
 🏁 Katkı ve Geliştirme
 
 Katkıda bulunmak için yeni bir branch oluşturun ve pull request gönderin.
 Yeni model veya analiz çıktısı eklemek isterseniz backend/app.py içindeki generate_feedback() fonksiyonunu düzenleyebilirsiniz.
+
+---
 
 🎬 Canlı Demo
 
